@@ -25,6 +25,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,25 +34,35 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import com.sudipta.geolensattendance.ui.theme.GeoLensAttendanceTheme
 import com.sudipta.geolensattendance.ui.theme.lightBlue
 
 @Composable
-fun OfficeContextScreen(modifier: Modifier = Modifier) {
-    val location = LatLng(23.77996729240009, 90.40694043390951)
+fun OfficeContextScreen(
+    modifier: Modifier = Modifier,
+    location: LatLng,
+    onSetLocation: () -> Unit
+) {
 
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(
-            location,
-            15f
+        position = CameraPosition.fromLatLngZoom(location, 15f)
+    }
+
+    LaunchedEffect(location) {
+        cameraPositionState.animate(
+            update = CameraUpdateFactory.newLatLngZoom(location, 15f)
         )
     }
+
+    val markerState = remember(location) { MarkerState(position = location) }
 
     Card(
         modifier = modifier
@@ -95,7 +107,7 @@ fun OfficeContextScreen(modifier: Modifier = Modifier) {
                 cameraPositionState = cameraPositionState
             ) {
                 Marker(
-                    state = rememberMarkerState(position = location),
+                    state = markerState,
                     title = "Office Location"
                 )
             }
@@ -107,9 +119,7 @@ fun OfficeContextScreen(modifier: Modifier = Modifier) {
             )
 
             OutlinedButton(
-                onClick = {
-                    // TODO: Set office location
-                },
+                onClick = onSetLocation,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp),
@@ -147,6 +157,9 @@ fun OfficeContextScreen(modifier: Modifier = Modifier) {
 @Composable
 fun OfficeContextScreenPreview() {
     GeoLensAttendanceTheme {
-        OfficeContextScreen()
+        OfficeContextScreen(
+            location = LatLng(23.77996729240009, 90.40694043390951),
+            onSetLocation = {}
+        )
     }
 }

@@ -3,9 +3,14 @@ package com.sudipta.geolensattendance.services
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class SharedPreferenceService(context: Context) {
-
+@Singleton
+class SharedPreferenceService @Inject constructor(
+    @ApplicationContext context: Context
+) {
     private val prefs: SharedPreferences =
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 

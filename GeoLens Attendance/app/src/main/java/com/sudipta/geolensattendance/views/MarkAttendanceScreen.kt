@@ -50,7 +50,6 @@ fun MarkAttendanceScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-
         Icon(
             imageVector = Icons.Outlined.Lock,
             contentDescription = "Locked",

@@ -89,7 +89,7 @@ fun DistanceStatusScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = distance.toString(),
+                    text = "$distance m",
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black

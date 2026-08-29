@@ -1,32 +1,32 @@
 package com.sudipta.geolensattendance.viewModels
 
-import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sudipta.geolensattendance.models.AttendanceUiState
 import com.sudipta.geolensattendance.services.GpsLocationService
 import com.sudipta.geolensattendance.services.SharedPreferenceService
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AttendanceViewModel(
-    context: Context,
-    private val locationService: GpsLocationService = GpsLocationService(context),
-    private val prefsService: SharedPreferenceService = SharedPreferenceService(context)
+@HiltViewModel
+class AttendanceViewModel @Inject constructor(
+    private val locationService: GpsLocationService,
+    private val prefsService: SharedPreferenceService
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AttendanceUiState())
     val uiState: StateFlow<AttendanceUiState> = _uiState.asStateFlow()
 
-    companion object {
-        private const val RADIUS_METERS = 50f
-    }
+    private var locationJob: Job? = null
 
     init {
         loadOfficeLocation()
-        observeCurrentLocation()
     }
 
     private fun loadOfficeLocation() {
@@ -40,6 +40,9 @@ class AttendanceViewModel(
             _uiState.value = _uiState.value.copy(isLoading = true, message = null)
 
             val location = locationService.getCurrentLocation()
+
+            Log.d("Location", "Office location = $location")
+
             if (location == null) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
@@ -59,14 +62,16 @@ class AttendanceViewModel(
         }
     }
 
-    private fun observeCurrentLocation() {
-        viewModelScope.launch {
+    fun startObservingLocation() {
+        locationJob?.cancel()
+        locationJob = viewModelScope.launch {
             locationService.getLocationUpdates().collect { location ->
+                Log.d("Location", "User location = $location")
                 val officeLat = _uiState.value.officeLat
                 val officeLng = _uiState.value.officeLng
 
                 if (officeLat != null && officeLng != null) {
-                    val distance = GpsLocationService.distanceBetween(
+                    val distance = locationService.distanceBetween(
                         location.latitude, location.longitude,
                         officeLat, officeLng
                     )
@@ -86,5 +91,9 @@ class AttendanceViewModel(
         } else {
             _uiState.value = _uiState.value.copy(message = "You are out of range.")
         }
+    }
+
+    companion object {
+        private const val RADIUS_METERS = 50f
     }
 }

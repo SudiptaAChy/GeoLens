@@ -1,19 +1,45 @@
 package com.sudipta.geolensattendance.views
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.gms.maps.model.LatLng
 import com.sudipta.geolensattendance.ui.theme.GeoLensAttendanceTheme
+import com.sudipta.geolensattendance.viewModels.AttendanceViewModel
 
 @Composable
-fun AttendanceScreen(modifier: Modifier = Modifier) {
+fun AttendanceScreen(
+    modifier: Modifier = Modifier,
+    hasLocationPermission: Boolean
+) {
+    val context = LocalContext.current
     val scrollState = rememberScrollState()
+    val viewModel: AttendanceViewModel = hiltViewModel()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(hasLocationPermission) {
+        if (hasLocationPermission) {
+            viewModel.startObservingLocation()
+        }
+    }
+
+    LaunchedEffect(uiState.message) {
+        uiState.message?.let { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -21,11 +47,20 @@ fun AttendanceScreen(modifier: Modifier = Modifier) {
             .verticalScroll(scrollState)
             .padding(16.dp)
     ) {
-        OfficeContextScreen()
+        OfficeContextScreen(
+            location = LatLng(uiState.officeLat ?: 0.0, uiState.officeLng ?: 0.0),
+            onSetLocation = { viewModel.setOfficeLocation() }
+        )
 
-        DistanceStatusScreen(modifier = modifier, distance = 120)
+        DistanceStatusScreen(
+            modifier = modifier,
+            distance = uiState.currentDistance?.toInt() ?: 0
+        )
 
-        MarkAttendanceScreen(modifier = modifier, onClick = null)
+        MarkAttendanceScreen(
+            modifier = modifier,
+            onClick = if (uiState.isMarkEnabled) { { viewModel.markAttendance() } } else null
+        )
     }
 }
 
@@ -33,6 +68,6 @@ fun AttendanceScreen(modifier: Modifier = Modifier) {
 @Composable
 fun AttendanceScreenPreview() {
     GeoLensAttendanceTheme {
-        AttendanceScreen()
+        AttendanceScreen(hasLocationPermission = false)
     }
 }
