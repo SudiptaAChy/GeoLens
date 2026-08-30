@@ -81,4 +81,4 @@ All AI-suggested code was reviewed, tested, and iterated on before being accepte
 
 ## Screen Recording
 
-<video src="../recordings/capture.mp4" controls width="300"></video>
+<video src="https://raw.githubusercontent.com/SudiptaAChy/GeoLens/main/recordings/capture.mp4" controls width="400"></video>
