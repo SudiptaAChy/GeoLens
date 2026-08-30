@@ -2,7 +2,9 @@ package com.sudipta.geolensattendance.views
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -42,7 +44,7 @@ fun AttendanceScreen(
     }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
             .padding(16.dp)
@@ -53,14 +55,18 @@ fun AttendanceScreen(
         )
 
         DistanceStatusScreen(
-            modifier = modifier,
             distance = uiState.currentDistance?.toInt() ?: 0
         )
 
-        MarkAttendanceScreen(
-            modifier = modifier,
-            onClick = if (uiState.isMarkEnabled) { { viewModel.markAttendance() } } else null
-        )
+        Spacer(modifier = Modifier.height(10.dp))
+
+        MarkAttendanceScreen {
+            if (uiState.isMarkEnabled) {
+                viewModel.markAttendance()
+            } else {
+                null
+            }
+        }
     }
 }
 
