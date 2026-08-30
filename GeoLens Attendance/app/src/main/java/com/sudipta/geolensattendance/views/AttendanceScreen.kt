@@ -60,11 +60,9 @@ fun AttendanceScreen(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        MarkAttendanceScreen {
+        MarkAttendanceScreen(enabled = uiState.isMarkEnabled) {
             if (uiState.isMarkEnabled) {
                 viewModel.markAttendance()
-            } else {
-                null
             }
         }
     }

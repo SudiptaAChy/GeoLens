@@ -87,7 +87,10 @@ class AttendanceViewModel @Inject constructor(
     fun markAttendance() {
         val distance = _uiState.value.currentDistance
         if (distance != null && distance <= RADIUS_METERS) {
-            _uiState.value = _uiState.value.copy(message = "Attendance marked successfully!")
+            _uiState.value = _uiState.value.copy(
+                isMarkEnabled = false,
+                message = "Attendance marked successfully!"
+            )
         } else {
             _uiState.value = _uiState.value.copy(message = "You are out of range.")
         }

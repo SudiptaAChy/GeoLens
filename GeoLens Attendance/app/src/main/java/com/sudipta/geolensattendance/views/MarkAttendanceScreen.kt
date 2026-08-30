@@ -22,7 +22,8 @@ import com.sudipta.geolensattendance.ui.theme.lightBlue
 @Composable
 fun MarkAttendanceScreen(
     modifier: Modifier = Modifier,
-    onClick: (() -> Unit)?
+    enabled: Boolean,
+    onClick: (() -> Unit),
 ) {
     Column(
         modifier = modifier
@@ -58,7 +59,7 @@ fun MarkAttendanceScreen(
         )
 
         Button(
-            onClick = { onClick?.invoke() },
+            onClick = onClick,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
@@ -67,7 +68,7 @@ fun MarkAttendanceScreen(
                 containerColor = lightBlue,
                 contentColor = Color.White
             ),
-            enabled = (onClick != null)
+            enabled = enabled
         ) {
             Text(
                 text = "Mark Attendance",
@@ -88,6 +89,6 @@ fun MarkAttendanceScreen(
 @Composable
 fun MarkAttendanceScreenPreview() {
     GeoLensAttendanceTheme {
-        MarkAttendanceScreen {}
+        MarkAttendanceScreen(enabled = true) {}
     }
 }
