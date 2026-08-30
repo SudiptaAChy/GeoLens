@@ -22,7 +22,6 @@ class UploadListItem extends StatelessWidget {
         leading: ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: Image.file(
-            // local file preview — falls back gracefully if missing
             errorBuilder: (context, error, stackTrace) => Container(
               width: 48,
               height: 48,
